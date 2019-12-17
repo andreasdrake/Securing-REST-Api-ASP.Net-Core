@@ -34,6 +34,7 @@ namespace LandonApi
                 .AddMvc(options =>
                 {
                     options.Filters.Add<JsonExceptionFilter>();
+                    options.Filters.Add<RequireHttpsOrCloseAttribute>();
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -67,10 +68,10 @@ namespace LandonApi
             }
             else
             {
-                app.UseHsts();
+               app.UseHsts();
             }
-
-            app.UseHttpsRedirection();
+            //Not needed, we use a filter to disallow any http call
+            //app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
