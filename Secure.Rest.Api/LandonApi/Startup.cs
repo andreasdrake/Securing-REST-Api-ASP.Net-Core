@@ -17,6 +17,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NSwag.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using LandonApi.Services;
+using AutoMapper;
+using LandonApi.Infrastructure;
 
 namespace LandonApi
 {
@@ -37,12 +40,14 @@ namespace LandonApi
             services.Configure<HotelInfo>(
                 Configuration.GetSection("Info"));
 
+            services.AddScoped<IRoomService, DefaultRoomService>();
+
             //Ude in-memory database for quick dev and testing
             //TODO: Swap out for a real database in production
             services.AddDbContext<HotelApiDbContext>(
                 options =>
                 {
-                options.UseInMemoryDatabase("landonDb");
+                    options.UseInMemoryDatabase("landonDb");
                 });
 
             services
@@ -50,6 +55,8 @@ namespace LandonApi
                 {
                     options.Filters.Add<JsonExceptionFilter>();
                     options.Filters.Add<RequireHttpsOrCloseAttribute>();
+                    options.Filters.Add<LinkRewritingFilter>();
+                
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -86,6 +93,8 @@ namespace LandonApi
                         }
                     });
             });
+
+            services.AddAutoMapper(typeof(Startup));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
